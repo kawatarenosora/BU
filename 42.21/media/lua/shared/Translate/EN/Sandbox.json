@@ -1,0 +1,7 @@
+{
+    "Sandbox_BU": "BU (Backup WIP)",
+    "Sandbox_BU_EnableNotify": "Show Notifications",
+    "Sandbox_BU_EnableNotify_tooltip": "Show halo/notification for backup and restore progress.",
+    "Sandbox_BU_BackupOnManualKey": "Enable Manual Key",
+    "Sandbox_BU_BackupOnManualKey_tooltip": "F6 (configurable). In-game: backup. Title screen: toggle restore list."
+}

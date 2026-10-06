@@ -1,0 +1,48 @@
+plugins { id 'java'; id 'com.gradleup.shadow' version '9.2.2' }
+
+// BU agent is version-independent (pure java.nio + one LuaManager hook),
+// so the default revision is a display tag only (lenient gate).
+// Override if needed: gradle build -PbuRev=<tag>
+def buRev = findProperty('buRev') ?: 'unversioned'
+
+repositories { mavenCentral() }
+
+dependencies {
+    implementation 'net.bytebuddy:byte-buddy:1.18.8'
+}
+
+sourceSets {
+    main {
+        java { srcDirs = ['src/main/java'] }
+        resources { srcDirs = ['src/main/resources'] }
+    }
+}
+
+processResources {
+    filesMatching('bu/build-info.properties') {
+        expand(revision: buRev)
+    }
+}
+
+compileJava {
+    sourceCompatibility = 25
+    targetCompatibility = 25
+    options.encoding = 'UTF-8'
+}
+
+// Shipped artifact is the shaded agent: build with `gradle clean shadowJar`.
+jar { enabled = false }
+
+shadowJar {
+    archiveBaseName.set('bu-agent')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+    relocate 'net.bytebuddy', 'bu.shade.net.bytebuddy'
+    manifest {
+        attributes(
+            'Premain-Class': 'bu.Agent',
+            'Can-Redefine-Classes': 'true',
+            'Can-Retransform-Classes': 'true'
+        )
+    }
+}

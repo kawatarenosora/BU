@@ -1,0 +1,27 @@
+# Gradle
+agent/.gradle/
+agent/build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+bin/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Not a build artifact, but easy to create by accident: the jar is committed
+# at 42.21/agent/bu-agent.jar. dist/ was a third copy and was removed.
+dist/
+
+# Editor backups
+*~
+*.bak
+*.swp
