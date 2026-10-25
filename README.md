@@ -30,7 +30,7 @@ Because backup is in-game-only and restore is title-only, the two never collide 
 3. A halo notification reports the result.
 
 > [!TIP]
-> Opening the ESC menu before pressing the key is the safest way to back up: the game is already paused, so nothing can write to the save while it is being copied.
+> The safest way to back up is a 3-step sequence: 1) open the ESC menu (game paused), 2) press the key — the start notification confirms the backup has begun, 3) close the menu and return to the game. The backup does not progress while the ESC menu is open: it needs the game ticking, so it runs after you return, and the done/failed notification fires the moment it finishes (including a return to normal game state).
 
 ### Restore (title screen)
 

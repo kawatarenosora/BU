@@ -88,7 +88,7 @@ function BU.requestManual()
     local now = BU.nowMs()
     if client.lastManualMs and now ~= 0 and (now - client.lastManualMs) < 2000 then return end
     client.lastManualMs = now
-    print("[BU] manual backup requested (open ESC menu = paused = safest)")
+    print("[BU] manual backup requested")
     BU.doBackup(true)
 end
 
