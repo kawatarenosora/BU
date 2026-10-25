@@ -1,7 +1,7 @@
 name=BU
 id=BU
 author=BU
-description=Backup mod (temp name BU). Manual backup to external folder + title restore. Requires bu-agent (-javaagent).
+description=Manual backup of the current save (hotkey) + title-screen restore. Requires bu-agent (-javaagent).
 modversion=0.5.0
 pzversion=42.21
-url=
+url=https://github.com/kawatarenosora/BU

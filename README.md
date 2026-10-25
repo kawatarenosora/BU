@@ -1,4 +1,4 @@
-# BU [agent] - Manual backup and restore mod for Project Zomboid
+# BU - Manual backup and restore mod for Project Zomboid
 
 A JavaAgent mod for Project Zomboid B42.21. Backs up the current save on a hotkey, and restores it from the title screen.
 
@@ -14,7 +14,7 @@ Project Zomboid autosaves on its own schedule, which means the newest save on di
 
 ## Controls
 
-One key does both jobs. It is `F6` by default and can be rebound in Mod Options (`[BU]`).
+One key does both jobs. It is `F8` by default and can be rebound in Mod Options (`[BU]`). (`F6` was avoided because it is the vanilla fast-forward shortcut.)
 
 | Screen | Action |
 | --- | --- |
@@ -78,13 +78,12 @@ Change them in Mod Options on the title screen.
 
 ## Requirements / Installation
 
-### jar location (once published to Workshop)
+### jar location (Workshop)
 
-> [!IMPORTANT]
-> The Workshop item is not published yet. Until it is, use the manual setup below. This section is a placeholder: replace `<WORKSHOP_ID>` with the real ID once the item is up.
+Subscribing to the Workshop item places the jar at the path below. Point the launcher or the manual `-javaagent` setup that follows at this file.
 
 ```text
-<SteamLibrary>\steamapps\workshop\content\108600\<WORKSHOP_ID>\mods\BU\42.21\agent\bu-agent.jar
+<SteamLibrary>\steamapps\workshop\content\108600\3827082187\mods\BU\42.21\agent\bu-agent.jar
 ```
 
 Note: `<SteamLibrary>` varies by environment (default is `C:\Program Files (x86)\Steam`).

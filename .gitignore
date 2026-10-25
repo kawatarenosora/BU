@@ -25,3 +25,10 @@ dist/
 *~
 *.bak
 *.swp
+
+# Local-only files, not part of the published repository:
+#   workshop.txt  - Workshop upload descriptor (holds the not-yet-assigned
+#                   Workshop ID)
+#   README.ja.md  - private Japanese copy kept for proofreading
+workshop.txt
+README.ja.md

@@ -1,5 +1,5 @@
 -- BU_client.lua v0.5.0 - Java premise
--- One key (F6 by default, changeable in mod options) does both jobs,
+-- One key (F8 by default, changeable in mod options) does both jobs,
 -- split by screen so the two can never collide:
 --   in-game          -> backup: pause (speed 0 + NoSave attempt) ->
 --                      guard&lock -> retry on transient -> unlock.
@@ -12,7 +12,7 @@
 -- escapes pcall. All object calls go through jobj().
 require "BU"
 
-local KEY_F6 = 64
+local KEY_F8 = 66 -- LWJGL keycode; F6=64 clashes with vanilla fast-forward
 
 BU.client = BU.client or {}
 local client = BU.client
@@ -62,7 +62,7 @@ function BU.getManualKey()
             if ok and v and v ~= 0 then return v end
         end
     end
-    return KEY_F6
+    return KEY_F8
 end
 
 function BU.requestManual()
@@ -271,8 +271,8 @@ local function onGameBoot()
         end
         if not exists then
             table.insert(keyBinding, { value = "[BU]" })
-            table.insert(keyBinding, { value = "BU_Manual", key = KEY_F6 })
-            print("[BU] keyBinding registered F6")
+            table.insert(keyBinding, { value = "BU_Manual", key = KEY_F8 })
+            print("[BU] keyBinding registered F8")
         end
     end
 end
@@ -280,7 +280,7 @@ end
 local function onGameStart()
     BU.menuMode = false
     client.closeList()
-    print("[BU] OnGameStart (F6 backup in-game, F6 restore list on title)")
+    print("[BU] OnGameStart (F8 backup in-game, F8 restore list on title)")
 end
 
 local function onMainMenuEnter()
@@ -312,4 +312,4 @@ if Events.OnMainMenuEnter then
     Events.OnMainMenuEnter.Add(onMainMenuEnter)
 end
 
-print("[BU] client v" .. BU.version .. " loaded - F6: backup in-game / toggle restore list on title")
+print("[BU] client v" .. BU.version .. " loaded - F8: backup in-game / toggle restore list on title")
