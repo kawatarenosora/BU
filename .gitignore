@@ -18,7 +18,8 @@ Thumbs.db
 desktop.ini
 
 # Not a build artifact, but easy to create by accident: the jar is committed
-# at 42.21/agent/bu-agent.jar. dist/ was a third copy and was removed.
+# at 42/agent/<game-build>/bu-agent.jar (one subfolder per supported build).
+# dist/ was a third copy and was removed.
 dist/
 
 # Editor backups
@@ -27,8 +28,8 @@ dist/
 *.swp
 
 # Local-only files, not part of the published repository:
-#   workshop.txt  - Workshop upload descriptor (holds the not-yet-assigned
-#                   Workshop ID)
+#   workshop.txt  - Workshop upload descriptor (authoring copy; deployed copy
+#                   lives in the Steam Workshop staging folder)
 #   README.ja.md  - private Japanese copy kept for proofreading
 workshop.txt
 README.ja.md

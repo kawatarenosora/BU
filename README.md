@@ -1,13 +1,13 @@
 # BU - Manual backup and restore mod for Project Zomboid
 
-A JavaAgent mod for Project Zomboid B42.21. Backs up the current save on a hotkey, and restores it from the title screen.
+A JavaAgent mod for Project Zomboid B42. Backs up the current save on a hotkey, and restores it from the title screen.
 
 Project Zomboid autosaves on its own schedule, which means the newest save on disk is never necessarily the state you want. This mod adds an explicit, on-demand backup you trigger yourself, so there is a known-good copy you can roll back to.
 
 > [!NOTE]
 > The Java part of this mod (bu-agent) must be specified via `-javaagent`. Subscribing alone does not enable it.
 
-- Supported: Build 42.21 / modversion 0.5.0
+- Supported: Build 42.21 / 42.22 / modversion 0.5.0
 - Client-side only. No server installation needed
 - Singleplayer and MP host supported. Disabled on MP clients (they have no local save)
 - English only. UI text is hardcoded, not looked up through the game's translation system, so it reads the same in every language setting
@@ -83,8 +83,10 @@ Change them in Mod Options on the title screen.
 Subscribing to the Workshop item places the jar at the path below. Point the launcher or the manual `-javaagent` setup that follows at this file.
 
 ```text
-<SteamLibrary>\steamapps\workshop\content\108600\3827082187\mods\BU\42.21\agent\bu-agent.jar
+<SteamLibrary>\steamapps\workshop\content\108600\3827082187\mods\BU\42\agent\<game-build>\bu-agent.jar
 ```
+
+BU uses a single `42/` version folder for the whole Build 42 line. Inside it, `agent/` holds one jar per supported build (`42.21/`, `42.22/`). The engine itself always selects the `42/` folder and needs no game-build awareness from you here; the only build-sensitive part is which jar you point `-javaagent` (or the launcher) at, so `<game-build>` is the folder under `agent/` matching your Project Zomboid build.
 
 Note: `<SteamLibrary>` varies by environment (default is `C:\Program Files (x86)\Steam`).
 How to check: Steam "Settings -> Storage" library folder, or game Properties -> "Installed Files" -> "Browse".
@@ -157,10 +159,13 @@ BU.WinState()
 ## Repository layout
 
 ```text
-42.21/
+42/
   media/lua/shared/   Core: backup/restore flow, retry state machine
   media/lua/client/   Hotkey handling and the restore list window
-  agent/bu-agent.jar  Distributable Java agent
+  mod.info            Single version folder for the whole B42 line
+  agent/<build>/
+    42.21/bu-agent.jar  Agent jar built for game rev 4a0e9546ec
+    42.22/bu-agent.jar  Agent jar built for game rev e013dbb529
 agent/src/            bu-agent sources (ByteBuddy hooks)
 ```
 

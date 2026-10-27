@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Never transform binary artifacts (README/doc files are text; everything
+# shipped to players stays byte-exact).
+*.jar binary
+*.png binary
+*.jpg binary
+*.exe binary
+*.dll binary
