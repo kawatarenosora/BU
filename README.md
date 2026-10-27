@@ -80,13 +80,13 @@ Change them in Mod Options on the title screen.
 
 ### jar location (Workshop)
 
-Subscribing to the Workshop item places the jar at the path below. Point the launcher or the manual `-javaagent` setup that follows at this file.
+Subscribing to the Workshop item places the jar at the path below. For the launcher, point it at this file. For manual setup, copy this file into the fixed folder described below — `-javaagent` itself always refers to the copied jar, and jar updates are re-copied the same way.
 
 ```text
 <SteamLibrary>\steamapps\workshop\content\108600\3827082187\mods\BU\42\agent\<game-build>\bu-agent.jar
 ```
 
-BU uses a single `42/` version folder for the whole Build 42 line. Inside it, `agent/` holds one jar per supported build (`42.21/`, `42.22/`). The engine itself always selects the `42/` folder and needs no game-build awareness from you here; the only build-sensitive part is which jar you point `-javaagent` (or the launcher) at, so `<game-build>` is the folder under `agent/` matching your Project Zomboid build.
+BU uses a single `42/` version folder for the whole Build 42 line. Inside it, `agent/` holds one jar per supported build (`42.21/`, `42.22/`). The engine itself always selects the `42/` folder and needs no game-build awareness from you here; the only build-sensitive part is which jar you pass to the launcher (or copy into the fixed folder for manual setup), so `<game-build>` is the folder under `agent/` matching your Project Zomboid build.
 
 Note: `<SteamLibrary>` varies by environment (default is `C:\Program Files (x86)\Steam`).
 How to check: Steam "Settings -> Storage" library folder, or game Properties -> "Installed Files" -> "Browse".
