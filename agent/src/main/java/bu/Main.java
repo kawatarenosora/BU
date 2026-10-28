@@ -4,14 +4,12 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * BU Java-mod entry point (ZombieBuddy edition).
+ * BU Java-mod entry point (ZombieBuddy side of the dual edition).
  *
  * ZombieBuddy loads the mod jar declared in mod.info (javaJarFile +
  * javaPkgName=bu) and invokes this Main class, on both ZB 2.x and 3.x.
- * No ByteBuddy and no -javaagent line anywhere: publication of
- * {@link BUControl} to Lua is arranged here (and redundantly by the
- * {@code @Exposer.LuaClass} annotation on BUControl, which ZB 3.x picks up
- * automatically when scanning the javaPkgName package).
+ * No ByteBuddy and no -javaagent line of BU's own: publication of
+ * {@link BUControl} to Lua is arranged here.
  *
  * All ZombieBuddy API calls go through reflection so the jar never becomes
  * dead weight when ZB moves an API; a missing method is a logged fallback,
@@ -21,13 +19,19 @@ import java.util.Properties;
 public class Main {
 
     public static void main(String[] args) {
+        // Single-bridge guard: when the player also runs the -javaagent
+        // edition, bu.Agent sets bu.javaagent=true before anything here and
+        // already publishes bu.BUControl - keep one bridge only.
+        if ("true".equals(System.getProperty("bu.javaagent"))) {
+            System.out.println("[BU] ZB jar load skipped: javaagent bridge already active (single-bridge guard)");
+            return;
+        }
         System.out.println("[BU] mod jar loaded rev=" + rev()
                 + " (ZombieBuddy edition, bu.BUControl)");
         if (expose()) {
             System.out.println("[BU] bu.BUControl exposure requested");
         } else {
-            System.err.println("[BU] exposure request failed; ZB's own "
-                    + "@Exposer.LuaClass scanning is the remaining path");
+            System.err.println("[BU] exposure request failed; install ZombieBuddy (or enable the javaagent bridge) to get a bridge");
         }
     }
 

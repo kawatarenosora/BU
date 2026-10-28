@@ -94,10 +94,10 @@ end
 function BU.bridge()
     local b = rawget(_G, "BUControl")
     if b ~= nil then return b end
-    -- ZombieBuddy edition publishes under the package path (bu.BUControl);
-    -- it carries no top-level alias, so self-install one here once. Later
-    -- lookups take the fast path. The javaagent edition (main branch)
-    -- provides the alias itself, so this keeps one Lua for both editions.
+    -- The ZB-loaded jar publishes under the package path (bu.BUControl) and
+    -- carries no top-level alias, so self-install one here once. Later
+    -- lookups take the fast path. The javaagent bridge starts from the
+    -- alias directly, so this path is the same for both editions.
     local ns = rawget(_G, "bu")
     if type(ns) == "table" then
         local c = rawget(ns, "BUControl")

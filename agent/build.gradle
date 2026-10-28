@@ -1,18 +1,27 @@
-plugins { id 'java' }
+plugins { id 'java'; id 'com.gradleup.shadow' version '9.2.2' }
 
-// BU mod jar for the ZombieBuddy edition: no ByteBuddy, no shading, no
-// premain. ZombieBuddy loads the jar (mod.info: javaJarFile + javaPkgName=bu)
-// and publishes bu.BUControl to Lua; bu.Main is the redundant trigger and
-// the only Java code that touches ZB APIs (via reflection only).
+// Dual edition: both artifacts build from the same sources.
 //
-// The default revision is a display tag only (the bridge is game
-// version-independent). Override if needed: gradle build -PbuRev=<tag>
+//  - shadowJar -> bu-agent.jar: classic javaagent jar. Ship it under
+//    42/agent/<game-build>/ (one folder per game build); players copy it to
+//    PZAgents and add -javaagent. Build per revision:
+//      gradle -p agent clean shadowJar -PbuRev=<game-git-rev>
+//    then copy build/libs/bu-agent.jar into the build's folder.
+//
+//  - jar -> bu-zb.jar: ZombieBuddy edition, written directly into the mod's
+//    media/java/ folder (mod.info: javaJarFile + javaPkgName=bu). Loaded
+//    automatically by an installed ZombieBuddy, no -javaagent line needed.
+//    The bridge itself is game-version independent here (reflective only).
+//
+//  When both run at once (ZB installed AND a -javaagent line), bu.Agent
+//  sets bu.javaagent=true in premain and bu.Main keeps the ZB side idle,
+//  so only one bridge is ever published to Lua.
 def buRev = findProperty('buRev') ?: 'unversioned'
 
-// Compile-only dependency: ZombieBuddy's API jar (the mod requires
-// ZombieBuddy at runtime, so ZB always provides these classes). Resolved
-// from a subscribed Workshop item by default; override with
-// -PzbJar=<path-to-ZombieBuddy.jar>.
+// Compile-only dependency: ZombieBuddy's API jar (the runtime always has
+// ZB, either installed framework-wide or via the javaagent edition which
+// never calls into it). Resolved from a subscribed Workshop item by
+// default; override with -PzbJar=<path-to-ZombieBuddy.jar>.
 //   item 3812624292 = ZombieBuddy BETA (3.x),   item 3619862853 = stable (2.x)
 def zbJar = findProperty('zbJar')
 if (!zbJar) {
@@ -32,8 +41,11 @@ if (!zbJar) {
 }
 println "[BU] compiling against ZombieBuddy API: ${zbJar}"
 
+repositories { mavenCentral() }
+
 dependencies {
-    compileOnly files(zbJar)
+    implementation 'net.bytebuddy:byte-buddy:1.18.8'   // agent edition hook only
+    compileOnly files(zbJar)                           // ZB API (referenced reflectively)
 }
 
 sourceSets {
@@ -55,11 +67,30 @@ compileJava {
     options.encoding = 'UTF-8'
 }
 
-// Shipped artifact is the plain mod jar, written directly into the mod's
-// media/java/ folder (see mod.info javaJarFile). Build with: gradle jar
+// ZB edition artifact. Note: agent-only classes are left out of this jar so
+// a stray -javaagent:<this jar> fails fast with "no Premain-Class" instead
+// of loading a half-bridge.
 jar {
     destinationDirectory = file('../42/media/java')
     archiveBaseName.set('bu-zb')
     archiveClassifier.set('')
     archiveVersion.set('')
+    exclude 'bu/Agent.class', 'bu/Agent$LogListener.class',
+            'bu/ExposeAdvice.class', 'bu/ExposeHook.class'
+}
+
+// Agent edition artifact (shaded; see header). Copy the result into
+// 42/agent/<game-build>/ manually.
+shadowJar {
+    archiveBaseName.set('bu-agent')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+    relocate 'net.bytebuddy', 'bu.shade.net.bytebuddy'
+    manifest {
+        attributes(
+            'Premain-Class': 'bu.Agent',
+            'Can-Redefine-Classes': 'true',
+            'Can-Retransform-Classes': 'true'
+        )
+    }
 }

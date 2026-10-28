@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import me.zed_0xff.zombie_buddy.Exposer;
-
 /**
  * BU backup bridge (exposed to Lua as bu.BUControl, plus a legacy top-level
  * BUControl alias that the Lua side self-installs).
@@ -27,14 +25,14 @@ import me.zed_0xff.zombie_buddy.Exposer;
  * Every write goes tmp -&gt; verify -&gt; swap so a failed attempt never
  * destroys the previous good backup.
  *
- * ZombieBuddy edition: publication to Lua is done by ZombieBuddy via the
- * {@code @Exposer.LuaClass} annotation (also picked up by ZB 3.x package
- * scanning) with bu.Main as the redundant trigger; there is no javaagent
- * and no ByteBuddy in this jar.
+ * Dual edition: publication to Lua comes from one of two sources, exactly
+ * one at a time - the -javaagent hook (bu.Agent, sets the bu.javaagent
+ * property) or the ZombieBuddy mod load (bu.Main, reflective
+ * Exposer.exposeClass call). No @Exposer.LuaClass annotation on purpose:
+ * ZB 3.x's automatic package scan would bypass the single-bridge guard.
  */
-@Exposer.LuaClass
 public class BUControl {
-    public static final String VERSION = "0.6.0-zb";
+    public static final String VERSION = "0.6.0";
     /** Max bytes to read from an exception message (keep Lua strings small). */
     private static final int MAX_MSG = 220;
 
