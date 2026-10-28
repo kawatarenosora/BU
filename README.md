@@ -1,13 +1,14 @@
 # BU - Manual backup and restore mod for Project Zomboid
 
-A JavaAgent mod for Project Zomboid B42. Backs up the current save on a hotkey, and restores it from the title screen.
+A Java mod for Project Zomboid B42 built on [ZombieBuddy](https://github.com/zed-0xff/ZombieBuddy). Backs up the current save on a hotkey, and restores it from the title screen.
 
 Project Zomboid autosaves on its own schedule, which means the newest save on disk is never necessarily the state you want. This mod adds an explicit, on-demand backup you trigger yourself, so there is a known-good copy you can roll back to.
 
 > [!NOTE]
-> The Java part of this mod (bu-agent) must be specified via `-javaagent`. Subscribing alone does not enable it.
+> The Java part of this mod (bu-zb.jar) runs through the [ZombieBuddy](https://github.com/zed-0xff/ZombieBuddy) framework. Install ZombieBuddy first, then enable both mods. Subscribing alone does not enable it.
 
-- Supported: Build 42.21 / 42.22 / modversion 0.5.0
+- Supported: Build 42.21 / 42.22 / modversion 0.6.0
+- Runs on ZombieBuddy 2.x (stable) and 3.x (beta), no -javaagent line of its own
 - Client-side only. No server installation needed
 - Singleplayer and MP host supported. Disabled on MP clients (they have no local save)
 - English only. UI text is hardcoded, not looked up through the game's translation system, so it reads the same in every language setting
@@ -78,51 +79,28 @@ Change them in Mod Options on the title screen.
 
 ## Requirements / Installation
 
-### jar location (Workshop)
+### 1. Install ZombieBuddy (required)
 
-Subscribing to the Workshop item places the jar at the path below. For the launcher, point it at this file. For manual setup, copy this file into the fixed folder described below — `-javaagent` itself always refers to the copied jar, and jar updates are re-copied the same way.
+BU's Java side runs through the [ZombieBuddy](https://github.com/zed-0xff/ZombieBuddy) framework. Once installed, it also loads the Java code of other mods (BU included) — no per-mod `-javaagent` line is needed.
 
-```text
-<SteamLibrary>\steamapps\workshop\content\108600\3827082187\mods\BU\42\agent\<game-build>\bu-agent.jar
-```
-
-BU uses a single `42/` version folder for the whole Build 42 line. Inside it, `agent/` holds one jar per supported build (`42.21/`, `42.22/`). The engine itself always selects the `42/` folder and needs no game-build awareness from you here; the only build-sensitive part is which jar you pass to the launcher (or copy into the fixed folder for manual setup), so `<game-build>` is the folder under `agent/` matching your Project Zomboid build.
-
-Note: `<SteamLibrary>` varies by environment (default is `C:\Program Files (x86)\Steam`).
-How to check: Steam "Settings -> Storage" library folder, or game Properties -> "Installed Files" -> "Browse".
-
-### Windows (recommended): use the launcher
-
-No manual JVM option editing or jar copying needed. Just point [PZ-JAM-Launcher](https://github.com/kawatarenosora/PZ-JAM-Launcher) to the jar above and launch.
-
-### Windows (manual setup)
-
-1. Open `C:\` in Explorer, create a new folder named `PZAgents` (result: `C:\PZAgents`).
-2. Quit the game and copy the jar above into `C:\PZAgents`.
-3. Back up `ProjectZomboid64.json` in the game folder, then add the following line inside the existing `vmArgs` array (mind the commas with neighboring entries. No need to replace the whole array).
-
-```json
-"-javaagent:C:/PZAgents/bu-agent.jar"
-```
-
-Note: if you want another folder, replace the path accordingly (for advanced users).
-
-### macOS / Linux (manual setup)
-
-1. Create a `PZAgents` folder in your home folder and copy the jar above into it.
-2. In Project Zomboid Properties -> "Launch Options", add the following (don't forget the trailing `--`).
+- **Windows (recommended)**: run [ZombieBuddyInstaller.exe](https://github.com/zed-0xff/ZombieBuddy/releases/tag/windows_installer). It detects Steam and the game automatically, copies the framework files and sets the launch option. Being subscribed to the ZombieBuddy Workshop item is required for it to work.
+- **macOS / Linux (manual)**: copy `ZombieBuddy.jar` to the game folder and add the following to launch options (don't forget the trailing `--`):
 
 ```text
--javaagent:"~/PZAgents/bu-agent.jar" --
+-javaagent:ZombieBuddy.jar --
 ```
 
-Note: if you want another folder, replace the path accordingly (for advanced users).
+### 2. Enable BU
+
+Subscribe to this Workshop item and enable **BU** (and **ZombieBuddy**) in the mod list. No jar copying, no launch-option editing.
+
+On the first launch, ZombieBuddy shows a one-time approval dialog for BU's Java jar (`42/media/java/bu-zb.jar` inside the mod — a plain, unsigned jar). Approve it, or approve permanently for this author/jar; the dialog does not reappear afterwards.
 
 ## Verify / Update / Remove
 
-- Check that the startup log contains `[BU-Agent] loaded rev=...` and `[BU] core loaded v...`. If the bridge is missing, `BU.Debug()` reports `bridge=false`, which means `-javaagent` was not picked up.
-- jar updates are announced in the Workshop changelog. Manual-setup users should re-copy after the announcement (launcher users need no reconfiguration).
-- To disable, disable the mod and remove only the argument above.
+- Check that the startup log contains `[BU] mod jar loaded rev=...` (ZombieBuddy) and `[BU] core loaded v...`. If the bridge is missing, `BU.Debug()` reports `bridge=false`, which means ZombieBuddy did not load the jar: is the ZombieBuddy launch option set, is the mod enabled, and was the jar approved?
+- jar updates are announced in the Workshop changelog and are picked up automatically on the next launch — nothing to re-copy.
+- To disable, disable the mod (and ZombieBuddy, if you no longer use other Java mods).
 - Note: no server installation needed (client-side only).
 
 ## Notes
@@ -160,28 +138,26 @@ BU.WinState()
 
 ```text
 42/
-  media/lua/shared/   Core: backup/restore flow, retry state machine
-  media/lua/client/   Hotkey handling and the restore list window
-  mod.info            Single version folder for the whole B42 line
-  agent/<build>/
-    42.21/bu-agent.jar  Agent jar built for game rev 4a0e9546ec
-    42.22/bu-agent.jar  Agent jar built for game rev e013dbb529
-agent/src/            bu-agent sources (ByteBuddy hooks)
+  media/lua/shared/     Core: backup/restore flow, retry state machine
+  media/lua/client/     Hotkey handling and the restore list window
+  media/java/bu-zb.jar  Java bridge jar, loaded by ZombieBuddy
+  mod.info              Single version folder for the whole B42 line
+agent/src/              bu-zb.jar sources (ZombieBuddy edition)
 ```
 
-## Building the agent
+## Building the jar
 
-Requires a JDK 25 toolchain.
+Requires a JDK 25 toolchain and a ZombieBuddy jar for compile-only use (auto-resolved from the subscribed Workshop items; override with `-PzbJar=<path>`).
 
 ```powershell
-gradle -p agent clean shadowJar -PbuRev=<tag>
+gradle -p agent clean jar -PbuRev=<tag>
 ```
 
-`-PbuRev` is written into `bu/build-info.properties` and logged at startup as `[BU-Agent] loaded rev=<tag>`. Omitting it produces `unversioned`.
+The plain `jar` task writes the artifact directly to `42/media/java/bu-zb.jar`. `-PbuRev` is written into `bu/build-info.properties` and logged at startup as `[BU] mod jar loaded rev=<tag>`. Omitting it produces `unversioned`.
 
 ## Credits
 
-- Uses [ByteBuddy](https://bytebuddy.net/) as the hook foundation for the Java agent.
+- Built on the [ZombieBuddy](https://github.com/zed-0xff/ZombieBuddy) modding framework (2.x / 3.x), which provides the Lua exposure this edition relies on.
 
 ## License
 

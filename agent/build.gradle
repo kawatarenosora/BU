@@ -1,14 +1,39 @@
-plugins { id 'java'; id 'com.gradleup.shadow' version '9.2.2' }
+plugins { id 'java' }
 
-// BU agent is version-independent (pure java.nio + one LuaManager hook),
-// so the default revision is a display tag only (lenient gate).
-// Override if needed: gradle build -PbuRev=<tag>
+// BU mod jar for the ZombieBuddy edition: no ByteBuddy, no shading, no
+// premain. ZombieBuddy loads the jar (mod.info: javaJarFile + javaPkgName=bu)
+// and publishes bu.BUControl to Lua; bu.Main is the redundant trigger and
+// the only Java code that touches ZB APIs (via reflection only).
+//
+// The default revision is a display tag only (the bridge is game
+// version-independent). Override if needed: gradle build -PbuRev=<tag>
 def buRev = findProperty('buRev') ?: 'unversioned'
 
-repositories { mavenCentral() }
+// Compile-only dependency: ZombieBuddy's API jar (the mod requires
+// ZombieBuddy at runtime, so ZB always provides these classes). Resolved
+// from a subscribed Workshop item by default; override with
+// -PzbJar=<path-to-ZombieBuddy.jar>.
+//   item 3812624292 = ZombieBuddy BETA (3.x),   item 3619862853 = stable (2.x)
+def zbJar = findProperty('zbJar')
+if (!zbJar) {
+    def roots = ['C:\\Program Files (x86)\\Steam', 'E:\\Program Files (x86)\\Steam']
+    def steamLib = System.getenv('STEAM_LIBRARY')
+    if (steamLib) { roots.add(0, steamLib) }
+    for (root in roots) {
+        for (id in ['3812624292', '3619862853']) {
+            def f = new File(root, "steamapps\\workshop\\content\\108600\\${id}\\mods\\ZombieBuddy\\libs\\ZombieBuddy.jar")
+            if (f.isFile()) { zbJar = f.absolutePath; break }
+        }
+        if (zbJar) { break }
+    }
+}
+if (!zbJar) {
+    throw new GradleException("ZombieBuddy.jar not found for compileOnly. Subscribe to the ZombieBuddy Workshop item and retry, or pass -PzbJar=<path-to-ZombieBuddy.jar>.")
+}
+println "[BU] compiling against ZombieBuddy API: ${zbJar}"
 
 dependencies {
-    implementation 'net.bytebuddy:byte-buddy:1.18.8'
+    compileOnly files(zbJar)
 }
 
 sourceSets {
@@ -30,19 +55,11 @@ compileJava {
     options.encoding = 'UTF-8'
 }
 
-// Shipped artifact is the shaded agent: build with `gradle clean shadowJar`.
-jar { enabled = false }
-
-shadowJar {
-    archiveBaseName.set('bu-agent')
+// Shipped artifact is the plain mod jar, written directly into the mod's
+// media/java/ folder (see mod.info javaJarFile). Build with: gradle jar
+jar {
+    destinationDirectory = file('../42/media/java')
+    archiveBaseName.set('bu-zb')
     archiveClassifier.set('')
     archiveVersion.set('')
-    relocate 'net.bytebuddy', 'bu.shade.net.bytebuddy'
-    manifest {
-        attributes(
-            'Premain-Class': 'bu.Agent',
-            'Can-Redefine-Classes': 'true',
-            'Can-Retransform-Classes': 'true'
-        )
-    }
 }
