@@ -14,7 +14,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * BU backup bridge (exposed to Lua as global BUControl via bu-agent).
+ * BU backup bridge (exposed to Lua as bu.BUControl, plus a legacy top-level
+ * BUControl alias that the Lua side self-installs).
  * All methods are static, pcall-safe and return plain Strings
  * (Kahlua-friendly: no overloaded Java objects leak to Lua).
  *
@@ -24,13 +25,14 @@ import java.util.List;
  * Every write goes tmp -&gt; verify -&gt; swap so a failed attempt never
  * destroys the previous good backup.
  *
- * Agent edition: identical logic to the former ZombieBuddy edition, minus
- * the ZB {@code Exposer} coupling. Publication to Lua is done by the
- * javaagent (bu.Agent hooking LuaManager$Exposer.exposeAll), not by mod
- * jar loading.
+ * Dual edition: publication to Lua comes from one of two sources, exactly
+ * one at a time - the -javaagent hook (bu.Agent, sets the bu.javaagent
+ * property) or the ZombieBuddy mod load (bu.Main, reflective
+ * Exposer.exposeClass call). No @Exposer.LuaClass annotation on purpose:
+ * ZB 3.x's automatic package scan would bypass the single-bridge guard.
  */
 public class BUControl {
-    public static final String VERSION = "0.5.0-agent";
+    public static final String VERSION = "0.6.0";
     /** Max bytes to read from an exception message (keep Lua strings small). */
     private static final int MAX_MSG = 220;
 

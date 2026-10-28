@@ -18,8 +18,7 @@ Thumbs.db
 desktop.ini
 
 # Not a build artifact, but easy to create by accident: the jar is committed
-# at 42/agent/<game-build>/bu-agent.jar (one subfolder per supported build).
-# dist/ was a third copy and was removed.
+# at 42/media/java/bu-zb.jar. dist/ was a third copy and was removed.
 dist/
 
 # Editor backups

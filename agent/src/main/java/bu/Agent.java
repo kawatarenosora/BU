@@ -37,6 +37,10 @@ public class Agent {
         if (!en) {
             return;
         }
+        // Single-bridge guard for the dual edition: the ZombieBuddy edition's
+        // bu.Main reads this and skips its own publication while the
+        // javaagent bridge is active.
+        System.setProperty("bu.javaagent", "true");
         try {
             new AgentBuilder.Default()
                     .with(new LogListener())

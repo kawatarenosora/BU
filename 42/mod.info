@@ -1,7 +1,9 @@
 name=BU
 id=BU
 author=BU
-description=Manual backup of the current save (hotkey) + title-screen restore. Requires bu-agent (-javaagent). The agent jar lives in agent/<game-build>/.
-modversion=0.5.0
+description=Manual backup of the current save (hotkey) + title-screen restore. Dual edition: runs through the ZombieBuddy framework if installed (no -javaagent line needed), or via the classic -javaagent jar under agent/ - pick whichever you prefer. The Java bridge jar lives in media/java/.
+modversion=0.6.0
 pzversion=42
 url=https://github.com/kawatarenosora/BU
+javaPkgName=bu
+javaJarFile=media/java/bu-zb.jar
